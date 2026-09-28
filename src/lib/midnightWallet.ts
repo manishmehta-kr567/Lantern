@@ -6,7 +6,8 @@ export interface InjectedWallet {
   name: string;
   apiVersion: string;
   isEnabled: () => Promise<boolean>;
-  enable: () => Promise<WalletApi>;
+  enable?: () => Promise<WalletApi>;
+  connect?: (networkId?: string) => Promise<WalletApi>;
 }
 
 export interface WalletApi {
@@ -40,8 +41,29 @@ export async function connectWallet(walletId?: string): Promise<{
   const target = walletId ? wallets.find((w) => w.id === walletId) : wallets[0];
   if (!target) throw new Error("The requested wallet is not installed.");
 
-  const api = await target.wallet.enable();
-  const state = await api.state();
+  const api = target.wallet.connect
+    ? await target.wallet.connect('preprod')
+    : await target.wallet.enable?.();
+  
+  if (!api) {
+    throw new Error("Wallet connection failed.");
+  }
+
+  let address = "";
+  try {
+    if (typeof (api as any).getPublicKeys === 'function') {
+      const keys = await (api as any).getPublicKeys();
+      address = keys?.coinPublicKey ?? "";
+    } else if ((api as any).coinPublicKey) {
+      address = (api as any).coinPublicKey;
+    } else if (typeof api.state === 'function') {
+      const state = await api.state();
+      address = state.address;
+    }
+  } catch (e) {
+    console.warn("Failed to extract address:", e);
+  }
+
   const serviceUriConfig = api.serviceUriConfig ? await api.serviceUriConfig() : undefined;
-  return { address: state.address, walletName: target.wallet.name, api, serviceUriConfig };
+  return { address, walletName: target.wallet.name, api, serviceUriConfig };
 }
