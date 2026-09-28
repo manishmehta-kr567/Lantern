@@ -142,9 +142,15 @@ async function main() {
   console.log("Deploying contract...");
   let success = false;
   try {
+    // The Lantern constructor takes one arg: label (Bytes<32>)
+    // We encode "lantern-channel" padded to 32 bytes.
+    const labelBytes = new Uint8Array(32);
+    const labelText = new TextEncoder().encode("lantern-channel");
+    labelBytes.set(labelText.slice(0, 32));
+
     const deployed = await deployContract(providers, {
         compiledContract: CompiledBBoardContractContract,
-        args: []
+        args: [labelBytes]
     });
     
     const contractAddress = deployed.deployTxData.public.contractAddress;
