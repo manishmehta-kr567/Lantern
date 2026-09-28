@@ -1,4 +1,5 @@
 import { getDeployment } from './contractClient';
+import { connectWallet } from './midnightWallet';
 
 // Helper to convert a hex string to Uint8Array
 function hexToBytes(hex: string): Uint8Array {
@@ -62,7 +63,7 @@ export async function submitReportOnChain(
     const ONEAM_PROOF_SERVER = 'https://api-preprod.1am.xyz';
 
     // Ensure we are connected
-    const { address, api } = await import('./midnightWallet').then(m => m.connectWallet());
+    const { address, api } = await connectWallet();
     const ap = api as unknown as Record<string, unknown>;
     
     const coinPublicKey = address;
