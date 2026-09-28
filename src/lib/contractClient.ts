@@ -30,9 +30,20 @@ export interface TxResult {
   explorerUrl: string;
 }
 
-export async function submitReport(_params: SubmitReportParams): Promise<TxResult> {
+export async function submitReport(params: SubmitReportParams): Promise<TxResult> {
   if (!isDeployed()) {
     throw new Error("No contract is deployed yet. Run `compact compile`, deploy to Preprod, and fill in deployed_contract.json.");
   }
-  throw new Error("Live circuit call not wired yet — see docs/USAGE.md 'Going from stub to live calls' for the exact steps once you've pinned a Midnight.js SDK version.");
+  
+  const { submitReportOnChain } = await import('./onchain');
+  const result = await submitReportOnChain(params.reporterSecret, params.category, params.hasDetails);
+  
+  if (result.ok) {
+    return {
+      txHash: result.txId,
+      explorerUrl: result.explorerUrl
+    };
+  } else {
+    throw new Error(result.error);
+  }
 }
