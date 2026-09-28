@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh && export PATH=\"$HOME/.local/bin:$PATH\" && compact update 0.31.1 || true && mkdir -p public/managed && compact compile preprod-deployment/contracts/src/bboard.compact public/managed/bboard && (cd preprod-deployment/contracts && npm run build) && tsc -b && vite build",
+    "build": "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh && export PATH=\"$HOME/.local/bin:$PATH\" && compact update 0.31.1 || true && mkdir -p preprod-deployment/contracts/src/managed/bboard && compact compile preprod-deployment/contracts/src/bboard.compact preprod-deployment/contracts/src/managed/bboard && (cd preprod-deployment/contracts && npm run build) && mkdir -p public/managed/bboard && cp -r preprod-deployment/contracts/src/managed/bboard/* public/managed/bboard/ && tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
