@@ -69,7 +69,8 @@ export circuit submitReport(category: Uint<8>): [] {
   const details = reportDetails();
 
   const leaf = persistentHash<Bytes<32>>(secret);
-  const computedRoot = merkleTreePathRoot<10, Bytes<32>>(path, leaf);
+  assert(path.leaf == leaf, "path leaf does not match secret");
+  const computedRoot = merkleTreePathRoot<10, Bytes<32>>(path);
   assert(computedRoot == eligibilityRoot, "not a verified reporter for this channel");
 
   const nullifier = persistentHash<Vector<2, Bytes<32>>>(
