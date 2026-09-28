@@ -25,9 +25,6 @@ jobs:
           npm install --no-save tsx
           node infra/scripts/patch-wallet-sdk.mjs
 
-      - name: Copy Contract
-        run: |
-          cp contracts/lantern.compact preprod-deployment/contracts/src/bboard.compact
 
       - name: Compile Contract
         run: |
