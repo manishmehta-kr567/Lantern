@@ -1,8 +1,7 @@
 import { Header } from "./components/Header";
 import { DeploymentBanner } from "./components/DeploymentBanner";
 import { ReportDesk } from "./components/ReportDesk";
-import { ChannelLedger } from "./components/ChannelLedger";
-import { PrivacyLedger } from "./components/PrivacyLedger";
+import { ZkVisualizer } from "./components/ZkVisualizer";
 import { useMidnightWallet } from "./hooks/useMidnightWallet";
 import { getDeployment } from "./lib/contractClient";
 
@@ -25,9 +24,8 @@ function App() {
         <section className="mb-10">
           <ReportDesk walletApi={wallet.walletApi} walletConnected={wallet.status === "connected"} />
         </section>
-        <section className="grid gap-6 sm:grid-cols-2">
-          <ChannelLedger />
-          <PrivacyLedger />
+        <section className="grid gap-6">
+          <ZkVisualizer />
         </section>
       </main>
       <footer className="border-t border-parchment/10">
