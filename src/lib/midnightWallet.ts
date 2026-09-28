@@ -72,9 +72,19 @@ export async function connectWallet(walletId?: string): Promise<{
     if (!address && typeof extApi.getShieldedAddresses === 'function') {
       const shield = await extApi.getShieldedAddresses();
       if (shield && Array.isArray(shield) && shield.length > 0) {
-        address = shield[0].shieldedCoinPublicKey || shield[0].coinPublicKey || shield[0];
+        const item = shield[0];
+        if (typeof item === 'string') {
+          address = item;
+        } else {
+          address = item.shieldedCoinPublicKey || item.coinPublicKey || "";
+        }
       } else if (shield) {
-        address = shield.shieldedCoinPublicKey || shield.coinPublicKey;
+        const item = shield as ShieldedAddress;
+        if (typeof item === 'string') {
+          address = item;
+        } else {
+          address = item.shieldedCoinPublicKey || item.coinPublicKey || "";
+        }
       }
     }
   } catch (e) {
