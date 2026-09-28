@@ -1,0 +1,95 @@
+// Lantern — anonymous incident reporting, verifiable participation
+// Midnight Builder Challenge — Level 3 (First Quarter)
+// Idea: Anonymous Feedback / Survey (whistleblower variant)
+//
+// PRIVACY MODEL
+//   PUBLIC   : channel label, the aggregate incident-category tally,
+//              how many reports included written detail, the set of
+//              spent nullifiers, channel open/closed status.
+//   PRIVATE  : the reporter's identity, the full text of every report,
+//              and any link between a nullifier and who filed it.
+//   PROVED WITHOUT REVEALING: that the caller is a verified member of
+//              the eligible reporting population (e.g. an employee)
+//              and has not filed a report through this channel before
+//              — without revealing who they are or what they reported.
+
+pragma language_version >= 0.16;
+
+import CompactStandardLibrary;
+
+// ---------------------------------------------------------------------
+// Ledger (PUBLIC on-chain state)
+// ---------------------------------------------------------------------
+
+export ledger channelLabel: Opaque<"string">;
+export ledger categoryTally: Map<Uint<8>, Counter>;  // category 1-5 -> count
+export ledger detailedReportCount: Counter;           // reports with written detail (content never on-chain)
+export ledger reportCount: Counter;
+export ledger usedNullifiers: Set<Bytes<32>>;
+export ledger eligibilityRoot: Bytes<32>;             // Merkle root of eligible reporters
+export ledger isOpen: Boolean;
+
+// ---------------------------------------------------------------------
+// Witnesses (PRIVATE — supplied locally by the reporter)
+// ---------------------------------------------------------------------
+
+witness reporterSecret(): Bytes<32>;
+witness reporterPath(): MerkleTreePath<10, Bytes<32>>;
+witness reportDetails(): Opaque<"string">;  // stays local; only its presence is ever counted
+
+// ---------------------------------------------------------------------
+// Circuits
+// ---------------------------------------------------------------------
+
+// Organization opens a reporting channel and publishes the Merkle root
+// of every verified reporter's hashed secret (e.g. current employees).
+export circuit openChannel(label: Opaque<"string">, root: Bytes<32>): [] {
+  channelLabel = label;
+  eligibilityRoot = root;
+  isOpen = true;
+  reportCount = default<Counter>;
+  detailedReportCount = default<Counter>;
+  for (const c of 1..6) {
+    categoryTally.insert(disclose(c), default<Counter>);
+  }
+}
+
+// A reporter proves, in zero-knowledge:
+//   1) their secret hashes into a leaf that is a member of eligibilityRoot
+//   2) the nullifier derived from that secret + channelLabel has not
+//      been used before (one report per reporter per channel)
+// Only the aggregate category counter (and the detail-count flag)
+// change on-chain. Report content never touches the ledger in any form
+// — not even as a hash — and no reporter identity is ever recorded.
+export circuit submitReport(category: Uint<8>): [] {
+  assert(isOpen, "channel is closed");
+  assert(category >= 1 && category <= 5, "category must be 1-5");
+
+  const secret = reporterSecret();
+  const path = reporterPath();
+  const details = reportDetails();
+
+  const leaf = persistentHash<Bytes<32>>(secret);
+  const computedRoot = merkleTreePathRoot<10, Bytes<32>>(path, leaf);
+  assert(computedRoot == eligibilityRoot, "not a verified reporter for this channel");
+
+  const nullifier = persistentHash<Vector<2, Bytes<32>>>(
+    [secret, persistentHash<Opaque<"string">>(channelLabel)]
+  );
+  assert(!usedNullifiers.member(nullifier), "a report has already been filed by this reporter");
+  usedNullifiers.insert(nullifier);
+
+  const current = categoryTally.lookup(disclose(category));
+  categoryTally.insert(disclose(category), current.increment(1));
+  reportCount.increment(1);
+
+  if (details.length() > 0) {
+    detailedReportCount.increment(1);
+  }
+}
+
+// Organization closes the channel. Aggregates remain exactly as they are.
+export circuit closeChannel(): [] {
+  assert(isOpen, "already closed");
+  isOpen = false;
+}

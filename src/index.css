@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+html, body { background: #101014; }
+body { font-family: "Inter", sans-serif; -webkit-font-smoothing: antialiased; }
+
+/* The lantern warms once when a category is chosen — one deliberate glow. */
+.lantern-glow {
+  background: radial-gradient(circle at 50% 0%, rgba(217, 122, 61, 0.14) 0%, rgba(217, 122, 61, 0.03) 50%, transparent 72%);
+}
+
+*:focus-visible { outline: 2px solid #d97a3d; outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
