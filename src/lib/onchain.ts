@@ -1,4 +1,3 @@
-import { midnightWallet } from './midnightWallet';
 import { getDeployment } from './contractClient';
 
 // Helper to convert a hex string to Uint8Array
@@ -64,19 +63,20 @@ export async function submitReportOnChain(
 
     // Ensure we are connected
     const { address, api } = await import('./midnightWallet').then(m => m.connectWallet());
-    const ap = api as Record<string, any>;
+    const ap = api as Record<string, unknown>;
     
-    let coinPublicKey = address;
-    let encryptionPublicKey = null;
+    const coinPublicKey = address;
+    let encryptionPublicKey: string | null = null;
     
     if (typeof ap.getShieldedAddresses === 'function') {
       try {
-        const shield = await ap.getShieldedAddresses();
+        const shield = await (ap.getShieldedAddresses as () => Promise<unknown>)();
         if (shield && Array.isArray(shield) && shield.length > 0) {
-          const item = shield[0];
+          const item = shield[0] as Record<string, string>;
           encryptionPublicKey = typeof item !== 'string' ? (item.shieldedEncryptionPublicKey || item.encryptionPublicKey || null) : null;
         } else if (shield) {
-          encryptionPublicKey = typeof shield !== 'string' ? (shield.shieldedEncryptionPublicKey || shield.encryptionPublicKey || null) : null;
+          const item = shield as Record<string, string>;
+          encryptionPublicKey = typeof shield !== 'string' ? (item.shieldedEncryptionPublicKey || item.encryptionPublicKey || null) : null;
         }
       } catch (e: unknown) { 
         console.error('getShieldedAddresses failed', e); 
@@ -91,10 +91,10 @@ export async function submitReportOnChain(
     const walletProvider = {
       getCoinPublicKey: () => coinPublicKey,
       getEncryptionPublicKey: () => (encryptionPublicKey || coinPublicKey),
-      balanceTx: async (tx: any) => {
+      balanceTx: async (tx: { serialize: () => Uint8Array }) => {
         const serializedTx = toHex(tx.serialize());
         if (typeof ap?.balanceUnsealedTransaction === 'function') {
-          const received = await ap.balanceUnsealedTransaction(serializedTx);
+          const received = await (ap.balanceUnsealedTransaction as (tx: string) => Promise<{ tx: string }>)(serializedTx);
           return Transaction.deserialize('signature', 'proof', 'binding', fromHex(received.tx));
         }
         throw new Error('balanceUnsealedTransaction missing');
@@ -102,11 +102,12 @@ export async function submitReportOnChain(
     };
 
     const midnightProvider = {
-      submitTx: async (tx: any) => {
+      submitTx: async (tx: { serialize: () => Uint8Array }) => {
         const txHex = toHex(tx.serialize());
         if (typeof ap?.submitTransaction === 'function') {
-          const res = await ap.submitTransaction(txHex);
-          let returnedId = typeof res === 'string' ? res : (res?.txHash || res?.id || '');
+          const res = await (ap.submitTransaction as (tx: string) => Promise<unknown>)(txHex);
+          const r = res as Record<string, string>;
+          const returnedId = typeof res === 'string' ? res : (r?.txHash || r?.id || '');
           return returnedId.replace(/^0x/, '');
         }
         throw new Error('Connected wallet does not support submitTransaction.');
@@ -142,10 +143,10 @@ export async function submitReportOnChain(
       }
     };
 
-    const deployedContract = (await findDeployedContract(providers as any, findArgs)) as any;
+    const deployedContract = (await findDeployedContract(providers as unknown as never, findArgs)) as { callTx: { checkAccess: () => Promise<{ public: { txHash: string }; txHash: string }> } };
     
     const tx = await deployedContract.callTx.checkAccess();
-    const txId = tx.public.txHash || tx.txHash;
+    const txId = tx.public?.txHash || tx.txHash;
 
     const cleanId = txId.replace(/^0x/, '');
     const explorerUrl = `https://preprod.midnightexplorer.com/tx/${cleanId}`;
