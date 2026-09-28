@@ -78,7 +78,7 @@ export circuit submitReport(category: Uint<8>): [] {
   usedNullifiers.insert(nullifier);
 
   const current = categoryTally.lookup(disclose(category));
-  categoryTally.insert(disclose(category), current + 1);
+  categoryTally.insert(disclose(category), (current + 1) as Uint<64>);
   reportCount.increment(1);
 
   if (details.length() > 0) {
