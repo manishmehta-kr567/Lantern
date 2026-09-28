@@ -4,32 +4,31 @@
 import { Ledger } from "./managed/bboard/contract/index.js";
 import { WitnessContext } from "@midnight-ntwrk/midnight-js-protocol/compact-runtime";
 
-// Private state: just the reporter's secret key.
 export type LanternPrivateState = {
   readonly secretKey: Uint8Array;
+  readonly merklePath: Uint8Array[];
+  readonly pathDirections: boolean[];
 };
 
-export const createLanternPrivateState = (secretKey: Uint8Array): LanternPrivateState => ({
+export const createLanternPrivateState = (secretKey: Uint8Array, merklePath: Uint8Array[], pathDirections: boolean[]): LanternPrivateState => ({
   secretKey,
+  merklePath,
+  pathDirections
 });
 
-// The witnesses object must have exactly one function per `witness` declaration
-// in lantern.compact:
-//   witness reporterSecretKey(): Bytes<32>
-//   witness reportHasDetail():   Boolean
-//
-// During deployment only the constructor runs — no witnesses are called —
-// but the Contract class constructor requires all witness functions to be
-// present, so we supply them here. The dummy values for reportHasDetail are
-// fine for deployment; real reporters will override them at call time.
 export const witnesses = {
-  reporterSecretKey: ({
+  secretKey: ({
     privateState,
   }: WitnessContext<Ledger, LanternPrivateState>): [LanternPrivateState, Uint8Array] =>
     [privateState, privateState.secretKey],
 
-  reportHasDetail: ({
+  merklePath: ({
     privateState,
-  }: WitnessContext<Ledger, LanternPrivateState>): [LanternPrivateState, boolean] =>
-    [privateState, false],
+  }: WitnessContext<Ledger, LanternPrivateState>): [LanternPrivateState, Uint8Array[]] =>
+    [privateState, privateState.merklePath],
+
+  pathDirections: ({
+    privateState,
+  }: WitnessContext<Ledger, LanternPrivateState>): [LanternPrivateState, boolean[]] =>
+    [privateState, privateState.pathDirections],
 };

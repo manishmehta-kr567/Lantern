@@ -124,12 +124,6 @@ export async function submitReportOnChain(
       accountId: coinPublicKey,
     });
 
-    const witnesses = {
-      secretKey: () => [reporterSecretHex ? hexToBytes(reporterSecretHex.padStart(64, '0').slice(0, 64)) : new Uint8Array(32)],
-      merklePath: () => [[new Uint8Array(32), new Uint8Array(32), new Uint8Array(32), new Uint8Array(32), new Uint8Array(32)]],
-      pathDirections: () => [[false, false, false, false, false]],
-    };
-
     const providers = {
       privateStateProvider,
       publicDataProvider: indexerPublicDataProvider(indexerHttp, indexerWs),
@@ -137,18 +131,21 @@ export async function submitReportOnChain(
       proofProvider,
       walletProvider,
       midnightProvider,
-      witnesses,
     };
+    
+    const latestPrivateState = { 
+        secretKey: reporterSecretHex ? hexToBytes(reporterSecretHex.padStart(64, '0').slice(0, 64)) : new Uint8Array(32),
+        merklePath: [new Uint8Array(32), new Uint8Array(32), new Uint8Array(32), new Uint8Array(32), new Uint8Array(32)],
+        pathDirections: [false, false, false, false, false],
+    };
+
+    await privateStateProvider.set(privateStateId, latestPrivateState);
     
     const findArgs = {
       contractAddress: CONTRACT_ADDRESS,
       compiledContract: CompiledBBoardContractContract,
       privateStateId,
-      initialPrivateState: { 
-        secretKey: reporterSecretHex ? hexToBytes(reporterSecretHex.padStart(64, '0').slice(0, 64)) : new Uint8Array(32),
-        merklePath: [new Uint8Array(32), new Uint8Array(32), new Uint8Array(32), new Uint8Array(32), new Uint8Array(32)],
-        pathDirections: [false, false, false, false, false],
-      }
+      initialPrivateState: latestPrivateState
     };
 
     const deployedContract = (await findDeployedContract(providers as unknown as never, findArgs)) as unknown as { callTx: { checkAccess: () => Promise<{ public: { txHash: string }; txHash: string }> } };
