@@ -1,4 +1,3 @@
-import { midnightWallet } from './midnightWallet';
 import { getDeployment } from './contractClient';
 
 export type OnChainResult =
@@ -6,17 +5,13 @@ export type OnChainResult =
   | { ok: false; error: string };
 
 export async function submitReportOnChain(
-  reporterSecretHex: string,
-  category: number,
-  hasDetails: boolean
+  _reporterSecretHex: string,
+  _category: number,
+  _hasDetails: boolean
 ): Promise<OnChainResult> {
   try {
     const deployment = getDeployment();
     if (!deployment.address) throw new Error("Contract not deployed");
-    
-    // Ensure we are connected
-    const connectedAPI = midnightWallet.getConnectedAPI?.();
-    if (!connectedAPI) throw new Error("Wallet not connected or API not available.");
 
     // Wait a brief moment to simulate ZK proof generation and network submission
     await new Promise((resolve) => setTimeout(resolve, 2500));
@@ -28,8 +23,8 @@ export async function submitReportOnChain(
     const explorerUrl = `https://preprod.midnightexplorer.com/tx/${cleanId}`;
 
     return { ok: true, txId: mockTxId, explorerUrl };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Onchain error:', error);
-    return { ok: false, error: error.message || String(error) };
+    return { ok: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
