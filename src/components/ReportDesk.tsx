@@ -38,6 +38,8 @@ export function ReportDesk({
         category,
         hasDetails: details.trim().length > 0,
       });
+      setDetails("");
+      setPhase("ready");
     } catch (e) {
       setErrorMsg(e instanceof Error ? e.message : "The report could not be submitted.");
       setPhase("error");

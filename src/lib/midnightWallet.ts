@@ -66,6 +66,15 @@ export async function connectWallet(walletId?: string): Promise<{
       const state = await api.state();
       address = state.address;
     }
+    
+    if (!address && typeof (api as any).getShieldedAddresses === 'function') {
+      const shield = await (api as any).getShieldedAddresses();
+      if (shield && Array.isArray(shield) && shield.length > 0) {
+        address = shield[0].shieldedCoinPublicKey || shield[0].coinPublicKey || shield[0];
+      } else if (shield) {
+        address = shield.shieldedCoinPublicKey || shield.coinPublicKey;
+      }
+    }
   } catch (e) {
     console.warn("Failed to extract address:", e);
   }
