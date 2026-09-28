@@ -139,8 +139,6 @@ export async function submitReportOnChain(
         pathDirections: [false, false, false, false, false],
     };
 
-    await privateStateProvider.set(privateStateId, latestPrivateState);
-    
     const findArgs = {
       contractAddress: CONTRACT_ADDRESS,
       compiledContract: CompiledBBoardContractContract,
@@ -149,6 +147,8 @@ export async function submitReportOnChain(
     };
 
     const deployedContract = (await findDeployedContract(providers as unknown as never, findArgs)) as unknown as { callTx: { checkAccess: () => Promise<{ public: { txHash: string }; txHash: string }> } };
+    
+    await privateStateProvider.set(privateStateId, latestPrivateState);
     
     const tx = await deployedContract.callTx.checkAccess();
     const txId = tx.public?.txHash || tx.txHash;
