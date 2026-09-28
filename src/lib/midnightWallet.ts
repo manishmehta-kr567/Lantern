@@ -51,11 +51,17 @@ export async function connectWallet(walletId?: string): Promise<{
 
   let address = "";
   try {
-    if (typeof (api as any).getPublicKeys === 'function') {
-      const keys = await (api as any).getPublicKeys();
+    type ExtendedApi = WalletApi & {
+      getPublicKeys?: () => Promise<{ coinPublicKey: string }>;
+      coinPublicKey?: string;
+    };
+    const extApi = api as ExtendedApi;
+
+    if (typeof extApi.getPublicKeys === 'function') {
+      const keys = await extApi.getPublicKeys();
       address = keys?.coinPublicKey ?? "";
-    } else if ((api as any).coinPublicKey) {
-      address = (api as any).coinPublicKey;
+    } else if (extApi.coinPublicKey) {
+      address = extApi.coinPublicKey;
     } else if (typeof api.state === 'function') {
       const state = await api.state();
       address = state.address;
