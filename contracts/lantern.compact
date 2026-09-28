@@ -35,7 +35,7 @@ export ledger isOpen: Boolean;
 
 witness reporterSecret(): Bytes<32>;
 witness reporterPath(): MerkleTreePath<10, Bytes<32>>;
-witness reportDetails(): Opaque<"string">;  // stays local; only its presence is ever counted
+witness hasDetails(): Boolean;    // true if reporter included written detail (text stays local)
 
 // ---------------------------------------------------------------------
 // Circuits
@@ -66,7 +66,7 @@ export circuit submitReport(category: Uint<8>): [] {
 
   const secret = reporterSecret();
   const path = reporterPath();
-  const details = reportDetails();
+  const hasDetailFlag = hasDetails();
 
   const leaf = persistentHash<Bytes<32>>(secret);
   assert(path.leaf == leaf, "path leaf does not match secret");
@@ -81,7 +81,7 @@ export circuit submitReport(category: Uint<8>): [] {
   categoryTally.insert(disclose(category), (current + 1) as Uint<64>);
   reportCount.increment(1);
 
-  if (details.length() > 0) {
+  if (hasDetailFlag) {
     detailedReportCount.increment(1);
   }
 }
