@@ -124,6 +124,12 @@ export async function submitReportOnChain(
       accountId: coinPublicKey,
     });
 
+    const witnesses = {
+      secretKey: () => [reporterSecretHex ? hexToBytes(reporterSecretHex.padStart(64, '0').slice(0, 64)) : new Uint8Array(32)],
+      merklePath: () => [[new Uint8Array(32), new Uint8Array(32), new Uint8Array(32), new Uint8Array(32), new Uint8Array(32)]],
+      pathDirections: () => [[false, false, false, false, false]],
+    };
+
     const providers = {
       privateStateProvider,
       publicDataProvider: indexerPublicDataProvider(indexerHttp, indexerWs),
@@ -131,6 +137,7 @@ export async function submitReportOnChain(
       proofProvider,
       walletProvider,
       midnightProvider,
+      witnesses,
     };
     
     const findArgs = {
