@@ -21,6 +21,7 @@ export function ReportDesk({
   const [details, setDetails] = useState("");
   const [phase, setPhase] = useState<Phase>("no-secret");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<{ txHash: string, url: string } | null>(null);
 
   function handleGenerateSecret() {
     setSecret(randomSecretHex());
@@ -31,8 +32,9 @@ export function ReportDesk({
     if (!secret || !walletApi || !isValidCategory(category)) return;
     setPhase("proving");
     setErrorMsg(null);
+    setSuccessMsg(null);
     try {
-      await submitReport({
+      const result = await submitReport({
         wallet: walletApi,
         reporterSecret: secret,
         category,
@@ -40,6 +42,7 @@ export function ReportDesk({
       });
       setDetails("");
       setPhase("ready");
+      setSuccessMsg({ txHash: result.txHash, url: result.explorerUrl });
     } catch (e) {
       setErrorMsg(e instanceof Error ? e.message : "The report could not be submitted.");
       setPhase("error");
@@ -99,6 +102,15 @@ export function ReportDesk({
 
             {errorMsg && (
               <p className="text-sm text-ember-light border border-ember/30 bg-ember/5 rounded-sm px-3 py-2 leading-relaxed">{errorMsg}</p>
+            )}
+
+            {successMsg && (
+              <div className="text-sm text-forest-light border border-forest/30 bg-forest/5 rounded-sm px-3 py-2 leading-relaxed flex flex-col gap-1">
+                <p>Report securely filed!</p>
+                <a href={successMsg.url} target="_blank" rel="noopener noreferrer" className="opacity-80 hover:opacity-100 hover:underline">
+                  Transaction: {successMsg.txHash.slice(0, 8)}…{successMsg.txHash.slice(-8)} ↗
+                </a>
+              </div>
             )}
 
             <button
