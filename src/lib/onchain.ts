@@ -63,7 +63,7 @@ export async function submitReportOnChain(
 
     // Ensure we are connected
     const { address, api } = await import('./midnightWallet').then(m => m.connectWallet());
-    const ap = api as Record<string, unknown>;
+    const ap = api as unknown as Record<string, unknown>;
     
     const coinPublicKey = address;
     let encryptionPublicKey: string | null = null;
@@ -143,7 +143,7 @@ export async function submitReportOnChain(
       }
     };
 
-    const deployedContract = (await findDeployedContract(providers as unknown as never, findArgs)) as { callTx: { checkAccess: () => Promise<{ public: { txHash: string }; txHash: string }> } };
+    const deployedContract = (await findDeployedContract(providers as unknown as never, findArgs)) as unknown as { callTx: { checkAccess: () => Promise<{ public: { txHash: string }; txHash: string }> } };
     
     const tx = await deployedContract.callTx.checkAccess();
     const txId = tx.public?.txHash || tx.txHash;
