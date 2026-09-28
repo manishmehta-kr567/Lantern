@@ -47,8 +47,7 @@ export circuit openChannel(label: Opaque<"string">, root: Bytes<32>): [] {
   channelLabel = label;
   eligibilityRoot = root;
   isOpen = true;
-  reportCount = default<Counter>;
-  detailedReportCount = default<Counter>;
+
   for (const c of 1..6) {
     categoryTally.insert(disclose(c), default<Counter>);
   }
