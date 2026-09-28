@@ -51,9 +51,11 @@ export async function connectWallet(walletId?: string): Promise<{
 
   let address = "";
   try {
+    type ShieldedAddress = { shieldedCoinPublicKey?: string; coinPublicKey?: string } | string;
     type ExtendedApi = WalletApi & {
       getPublicKeys?: () => Promise<{ coinPublicKey: string }>;
       coinPublicKey?: string;
+      getShieldedAddresses?: () => Promise<ShieldedAddress[] | ShieldedAddress>;
     };
     const extApi = api as ExtendedApi;
 
@@ -67,8 +69,8 @@ export async function connectWallet(walletId?: string): Promise<{
       address = state.address;
     }
     
-    if (!address && typeof (api as any).getShieldedAddresses === 'function') {
-      const shield = await (api as any).getShieldedAddresses();
+    if (!address && typeof extApi.getShieldedAddresses === 'function') {
+      const shield = await extApi.getShieldedAddresses();
       if (shield && Array.isArray(shield) && shield.length > 0) {
         address = shield[0].shieldedCoinPublicKey || shield[0].coinPublicKey || shield[0];
       } else if (shield) {
