@@ -73,9 +73,7 @@ export circuit submitReport(category: Uint<8>): [] {
   const computedRoot = merkleTreePathRoot<10, Bytes<32>>(path);
   assert(computedRoot == eligibilityRoot, "not a verified reporter for this channel");
 
-  const nullifier = persistentHash<Vector<2, Bytes<32>>>(
-    [secret, persistentHash<Opaque<"string">>(channelLabel)]
-  );
+  const nullifier = persistentHash<Bytes<32>>(secret);
   assert(!usedNullifiers.member(nullifier), "a report has already been filed by this reporter");
   usedNullifiers.insert(nullifier);
 
