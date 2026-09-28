@@ -63,6 +63,14 @@ jobs:
           NODE_OPTIONS: "--max-old-space-size=8192 --expose-gc"
           WALLET_SEED: 929dff99d9387db318b3bc54add98c5ce4fcc3386445a224e3332fe19a429610
 
+      - name: Commit deployed contract address
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add deployed_contract.json
+          git commit -m "Update deployed contract address" || echo "No changes to commit"
+          git push
+          
       - name: Upload Deployment Info
         if: always()
         uses: actions/upload-artifact@v4
