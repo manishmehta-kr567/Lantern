@@ -49,7 +49,7 @@ export async function submitReportOnChain(
       import('@midnight-ntwrk/midnight-js-network-id'),
       import('@midnight-ntwrk/midnight-js-protocol/ledger'),
       import('@midnight-ntwrk/midnight-js-utils'),
-      import('@midnight-ntwrk/midnight-js-protocol'),
+      import('@midnight-ntwrk/midnight-js-types'),
     ]);
 
     setNetworkId('preprod');
