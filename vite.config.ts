@@ -34,5 +34,5 @@ export default defineConfig({
       )
     }
   },
-  test: { environment: "jsdom", globals: true },
+  test: { environment: "jsdom", globals: true, exclude: ["scratch/**", "**/node_modules/**"] },
 });
