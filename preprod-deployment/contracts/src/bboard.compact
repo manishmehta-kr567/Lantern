@@ -73,7 +73,7 @@ export circuit publishAllowlist(newRoot: Bytes<32>): [] {
 // Using a hash-of-secret rather than a raw public key means the leaf
 // reveals nothing about the member's wallet or identity.
 // ----------------------------------------------------------------------------
-circuit leafOf(secret: Bytes<32>): Bytes<32> {
+export circuit leafOf(secret: Bytes<32>): Bytes<32> {
   return persistentHash<Vector<2, Bytes<32>>>([pad(32, "gatecheck:leaf"), secret]);
 }
 
@@ -89,7 +89,7 @@ circuit nullifierOf(secret: Bytes<32>): Bytes<32> {
 // ----------------------------------------------------------------------------
 // merkleRootFrom — recomputes a candidate root from a leaf + private path.
 // ----------------------------------------------------------------------------
-circuit merkleRootFrom(
+export circuit merkleRootFrom(
   leaf: Bytes<32>,
   path: Vector<5, Bytes<32>>,
   directions: Vector<5, Boolean>
