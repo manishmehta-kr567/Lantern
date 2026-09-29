@@ -24,7 +24,9 @@ export function ReportDesk({
   const [successMsg, setSuccessMsg] = useState<{ txHash: string, url: string } | null>(null);
 
   function handleGenerateSecret() {
-    setSecret(randomSecretHex());
+    // For dummy testing with the deployed contract, we must use an all-zero secret
+    // because the allowlistRoot on-chain was computed from an all-zero secret.
+    setSecret("0000000000000000000000000000000000000000000000000000000000000000");
     setPhase("ready");
   }
 

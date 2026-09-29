@@ -6,10 +6,9 @@ export async function sha256Hex(input: string): Promise<string> {
   return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-export function randomSecretHex(_bytes = 16): string {
-  // For dummy testing with the deployed contract, we must use an all-zero secret
-  // because the allowlistRoot on-chain was computed from an all-zero secret.
-  return "0000000000000000000000000000000000000000000000000000000000000000";
+export function randomSecretHex(bytes = 16): string {
+  const arr = crypto.getRandomValues(new Uint8Array(bytes));
+  return Array.from(arr).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 /** Matches `persistentHash<Bytes<32>>(secret)`. */
