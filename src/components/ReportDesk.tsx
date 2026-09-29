@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { randomSecretHex, isValidCategory } from "../lib/crypto";
+import { isValidCategory } from "../lib/crypto";
 import { submitReport, isDeployed } from "../lib/contractClient";
 import { WalletApi } from "../lib/midnightWallet";
 
