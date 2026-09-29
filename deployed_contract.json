@@ -1,6 +1,6 @@
 {
   "network": "preprod",
-  "address": "e045abc46d07d8631b1b53056e59190e22e5565f101b2cf7086379ef0ec8bad9",
-  "deployedAt": "2026-09-28T21:05:50Z",
+  "address": "e32578d74242fea41dcb1f41fa926c9038650d5aeda24f2897b39fdd04eda0ab",
+  "deployedAt": "2026-09-28T18:57:56Z",
   "note": "Populate this after running `compact compile` and deploying lantern.compact to Preprod. The app refuses to simulate transactions when this is null."
 }
