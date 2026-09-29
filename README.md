@@ -3,7 +3,11 @@
 > Anonymous incident reporting with verifiable participation. Built on Midnight.
 
 ## Live Demo
-[LIVE URL — add after deploying, e.g. Vercel/Netlify]
+[LIVE URL]
+
+## Verified Preprod Transaction
+You can view a fully verified end-to-end report submission on the Preprod network here:
+[Transaction 9c784940d15e1aadae1e65f0b886eb671135f84da7c40358926b9cb22e9d6b87 | 1AM Explorer](https://explorer.1am.xyz/tx/9c784940d15e1aadae1e65f0b886eb671135f84da7c40358926b9cb22e9d6b87?network=preprod)
 
 ## Contract Address
 | Network  | Address                          |
@@ -81,3 +85,4 @@ Vitest suite, and produces a production build.
 
 ## Product Proposal
 See [PROPOSAL.md](./PROPOSAL.md).
+
