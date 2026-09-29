@@ -34,7 +34,7 @@ export async function submitReportOnChain(
       { CompiledContract },
       { CompiledBBoardContractContract },
       { setNetworkId },
-      { Transaction },
+
       { toHex, fromHex },
     ] = await Promise.all([
       import('@midnight-ntwrk/midnight-js-indexer-public-data-provider'),
@@ -45,7 +45,7 @@ export async function submitReportOnChain(
       import('@midnight-ntwrk/midnight-js-protocol/compact-js'),
       import('@midnight-ntwrk/bboard-contract'),
       import('@midnight-ntwrk/midnight-js-network-id'),
-      import('@midnight-ntwrk/midnight-js-protocol/ledger'),
+
       import('@midnight-ntwrk/midnight-js-utils'),
     ]);
 
@@ -127,7 +127,7 @@ export async function submitReportOnChain(
             console.log('Balancing transaction via 1AM wallet balanceUnsealedTransaction...');
             const received = await (ap.balanceUnsealedTransaction as (s: string) => Promise<{ tx: string }>)(serializedTx);
             console.log('Wallet balanced transaction successfully!');
-            return (tx.constructor as any).deserialize(
+            return (tx.constructor as { deserialize: (s: string, p: string, b: string, raw: Uint8Array) => unknown }).deserialize(
               'signature',
               'pre-proof',
               'pre-binding',
@@ -148,7 +148,7 @@ export async function submitReportOnChain(
         });
         if (balanceResp.ok) {
           const { txBytes: balancedHex } = await balanceResp.json() as { txBytes: string };
-          return (tx.constructor as any).deserialize('signature', 'pre-proof', 'pre-binding', fromHex(balancedHex));
+          return (tx.constructor as { deserialize: (s: string, p: string, b: string, raw: Uint8Array) => unknown }).deserialize('signature', 'pre-proof', 'pre-binding', fromHex(balancedHex));
         }
 
         const errBody = await balanceResp.json().catch(() => ({})) as { error?: string };
