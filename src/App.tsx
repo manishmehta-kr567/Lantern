@@ -2,6 +2,7 @@ import { Header } from "./components/Header";
 import { DeploymentBanner } from "./components/DeploymentBanner";
 import { ReportDesk } from "./components/ReportDesk";
 import { ZkVisualizer } from "./components/ZkVisualizer";
+import { PrivacyExplainer } from "./components/PrivacyExplainer";
 import { useMidnightWallet } from "./hooks/useMidnightWallet";
 import { getDeployment } from "./lib/contractClient";
 
@@ -25,6 +26,7 @@ function App() {
           <ReportDesk walletApi={wallet.walletApi} walletConnected={wallet.status === "connected"} />
         </section>
         <section className="grid gap-6">
+          <PrivacyExplainer />
           <ZkVisualizer />
         </section>
       </main>
