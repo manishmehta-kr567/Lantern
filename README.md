@@ -8,7 +8,7 @@
 ## Contract Address
 | Network  | Address                          |
 |----------|-----------------------------------|
-| Preprod  | `e045abc46d07d8631b1b53056e59190e22e5565f101b2cf7086379ef0ec8bad9`    |
+| Preprod  | `e32578d74242fea41dcb1f41fa926c9038650d5aeda24f2897b39fdd04eda0ab`    |
 
 ## What This Does
 Lantern gives an organization a reporting channel where every report is
