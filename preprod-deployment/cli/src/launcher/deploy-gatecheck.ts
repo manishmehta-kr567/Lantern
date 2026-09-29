@@ -142,15 +142,17 @@ async function main() {
   console.log("Deploying contract...");
   let success = false;
   try {
-    // The Lantern constructor takes one arg: label (Bytes<32>)
-    // We encode "lantern-channel" padded to 32 bytes.
-    const labelBytes = new Uint8Array(32);
-    const labelText = new TextEncoder().encode("lantern-channel");
-    labelBytes.set(labelText.slice(0, 32));
+    // Derive the Merkle root for the dummy test user (all zeros) so they can pass checkAccess
+    const { pureCircuits } = await import('@midnight-ntwrk/bboard-contract');
+    const secret = new Uint8Array(32);
+    const leaf = pureCircuits.leafOf(secret);
+    const path = [new Uint8Array(32), new Uint8Array(32), new Uint8Array(32), new Uint8Array(32), new Uint8Array(32)];
+    const directions = [false, false, false, false, false];
+    const initialRoot = pureCircuits.merkleRootFrom(leaf, path, directions);
 
     const deployed = await deployContract(providers, {
         compiledContract: CompiledBBoardContractContract,
-        args: [labelBytes]
+        args: [initialRoot]
     });
     
     const contractAddress = deployed.deployTxData.public.contractAddress;
