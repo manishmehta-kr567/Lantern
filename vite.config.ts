@@ -10,6 +10,9 @@ export default defineConfig({
   resolve: {
     dedupe: [
       "@midnight-ntwrk/bboard-contract",
+      "@midnight-ntwrk/compact-js",
+      "@midnight-ntwrk/compact-runtime",
+      "@midnight-ntwrk/ledger-v8",
       "@midnight-ntwrk/midnight-js-contracts",
       "@midnight-ntwrk/midnight-js-fetch-zk-config-provider",
       "@midnight-ntwrk/midnight-js-http-client-proof-provider",
