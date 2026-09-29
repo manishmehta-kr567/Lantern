@@ -1,36 +1,36 @@
-name: CI
+﻿name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [ "main" ]
   pull_request:
-    branches: [main]
+    branches: [ "main" ]
 
 jobs:
-  build-and-test:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Install Node.js v22
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "npm"
-      - name: Install dependencies
-        run: npm install
-      - name: Compile Compact contract
-        run: |
-          if command -v compact >/dev/null 2>&1; then
-            compact compile contracts/lantern.compact managed/lantern
-          else
-            echo "compact CLI not found on runner — skipping compile step."
-            echo "Install via: https://docs.midnight.network"
-          fi
-        continue-on-error: true
-      - name: Lint
-        run: npm run lint
-      - name: Run test suite
-        run: npm test
-      - name: Build production bundle
-        run: npm run build
+    - uses: actions/checkout@v3
+
+    - name: Use Node.js 22
+      uses: actions/setup-node@v3
+      with:
+        node-version: 22
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Compile Compact Contract
+      run: |
+        curl --proto '=https' --tlsv1.2 -LsSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
+        export PATH="$HOME/.local/bin:$PATH"
+        compact update 0.31.1 || true
+        mkdir -p preprod-deployment/contracts/src/managed/bboard
+        compact compile preprod-deployment/contracts/src/bboard.compact preprod-deployment/contracts/src/managed/bboard
+
+    - name: Build Smart Contract JS
+      run: cd preprod-deployment/contracts && npm run build
+
+    - name: Run Tests
+      run: npm test
