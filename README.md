@@ -12,10 +12,14 @@
 You can view a fully verified end-to-end report submission on the Preprod network here:
 [Transaction 9c784940d15e1aadae1e65f0b886eb671135f84da7c40358926b9cb22e9d6b87 | 1AM Explorer](https://explorer.1am.xyz/tx/9c784940d15e1aadae1e65f0b886eb671135f84da7c40358926b9cb22e9d6b87?network=preprod)
 
+![Verified Transaction Screenshot](./screenshots/transaction onchain.png)
+
 ## Contract Address
 | Network  | Address                          |
 |----------|-----------------------------------|
-| Preprod  | `adf8297865a755b40cfacff2520badaadd8ce505c66a1ddab27e3045b835cec4`    |
+| Preprod  | [adf8297865a755b40cfacff2520badaadd8ce505c66a1ddab27e3045b835cec4](https://explorer.preprod.midnight.network/contracts/stream/adf8297865a755b40cfacff2520badaadd8ce505c66a1ddab27e3045b835cec4) |
+
+![Contract Deployment Screenshot](./screenshots/contract.png)
 
 ## What This Does
 Lantern gives an organization a reporting channel where every report is
@@ -88,4 +92,6 @@ Vitest suite, and produces a production build.
 
 ## Product Proposal
 See [PROPOSAL.md](./PROPOSAL.md).
+
+
 
