@@ -23,6 +23,7 @@
     "@midnight-ntwrk/midnight-js-network-id": "^4.1.1",
     "@midnight-ntwrk/midnight-js-protocol": "^4.1.1",
     "@midnight-ntwrk/midnight-js-utils": "^4.1.1",
+    "@noble/hashes": "^2.4.0",
     "assert": "^2.1.0",
     "buffer": "^6.0.3",
     "events": "^3.3.0",
@@ -31,6 +32,7 @@
     "vite-plugin-wasm": "^3.6.0"
   },
   "devDependencies": {
+    "@types/node": "^26.6.3",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.15.0",

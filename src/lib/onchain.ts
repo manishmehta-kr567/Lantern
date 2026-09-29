@@ -1,5 +1,6 @@
 import { getDeployment } from './contractClient';
 import { connectWallet } from './midnightWallet';
+import { blake2b } from '@noble/hashes/blake2b';
 
 // Helper to convert a hex string to Uint8Array
 function hexToBytes(hex: string): Uint8Array {
@@ -175,12 +176,21 @@ export async function submitReportOnChain(
 
     const midnightProvider = {
       submitTx: async (tx: { serialize: () => Uint8Array }) => {
-        const txHex = toHex(tx.serialize());
+        const txBytes = tx.serialize();
+        const txHex = toHex(txBytes);
+        const computedExtrinsicHash = toHex(blake2b(txBytes, { dkLen: 32 }));
+
         if (typeof ap?.submitTransaction === 'function') {
           const res = await (ap.submitTransaction as (s: string) => Promise<unknown>)(txHex);
-          const r = res as Record<string, string>;
-          const returnedId = typeof res === 'string' ? res : (r?.txHash || r?.hash || r?.id || '');
-          submittedTxId = returnedId.replace(/^0x/, '');
+          let returnedId: string | null = null;
+          if (typeof res === 'string' && res.length > 0) {
+            returnedId = res;
+          } else if (typeof res === 'object' && res !== null) {
+            const r = res as Record<string, string>;
+            returnedId = r?.txHash || r?.hash || r?.id || '';
+          }
+          const candidateId = returnedId || computedExtrinsicHash;
+          submittedTxId = candidateId.replace(/^0x/, '');
           return submittedTxId;
         }
         throw new Error('Connected wallet does not support submitting transactions.');
