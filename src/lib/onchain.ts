@@ -37,6 +37,7 @@ export async function submitReportOnChain(
 
       { Transaction },
       { toHex, fromHex },
+      { createProofProvider },
     ] = await Promise.all([
       import('@midnight-ntwrk/midnight-js-indexer-public-data-provider'),
       import('@midnight-ntwrk/midnight-js-http-client-proof-provider'),
@@ -48,6 +49,7 @@ export async function submitReportOnChain(
       import('@midnight-ntwrk/midnight-js-network-id'),
       import('@midnight-ntwrk/midnight-js-protocol/ledger'),
       import('@midnight-ntwrk/midnight-js-utils'),
+      import('@midnight-ntwrk/midnight-js-protocol'),
     ]);
 
     setNetworkId('preprod');
@@ -113,7 +115,21 @@ export async function submitReportOnChain(
     const compiledContract = withWitnessesFn(witnesses)(CompiledBBoardContractContract);
 
     const zkConfigProvider = new FetchZkConfigProvider(zkConfigPath, fetch.bind(window));
-    const proofProvider = httpClientProofProvider(ONEAM_PROOF_SERVER, zkConfigProvider);
+    let proofProvider: unknown;
+
+    if (typeof ap?.getProvingProvider === 'function') {
+      const provingFn = (ap.getProvingProvider as () => unknown)();
+      const pFn = provingFn as Record<string, unknown> | null;
+      if (pFn && typeof pFn.proveTx === 'function') {
+        proofProvider = pFn;
+      } else if (pFn && typeof pFn.prove === 'function') {
+        proofProvider = (createProofProvider as unknown as (p: unknown) => unknown)(pFn);
+      } else {
+        proofProvider = httpClientProofProvider(ONEAM_PROOF_SERVER, zkConfigProvider);
+      }
+    } else {
+      proofProvider = httpClientProofProvider(ONEAM_PROOF_SERVER, zkConfigProvider);
+    }
 
     let submittedTxId: string | null = null;
 
