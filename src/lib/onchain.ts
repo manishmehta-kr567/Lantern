@@ -129,8 +129,8 @@ export async function submitReportOnChain(
             console.log('Wallet balanced transaction successfully!');
             return Transaction.deserialize(
               'signature',
-              'proof',
-              'binding',
+              'pre-proof',
+              'pre-binding',
               fromHex(received.tx)
             );
           } catch (walletBalErr) {
@@ -148,7 +148,7 @@ export async function submitReportOnChain(
         });
         if (balanceResp.ok) {
           const { txBytes: balancedHex } = await balanceResp.json() as { txBytes: string };
-          return Transaction.deserialize('signature', 'proof', 'binding', fromHex(balancedHex));
+          return Transaction.deserialize('signature', 'pre-proof', 'pre-binding', fromHex(balancedHex));
         }
 
         const errBody = await balanceResp.json().catch(() => ({})) as { error?: string };
